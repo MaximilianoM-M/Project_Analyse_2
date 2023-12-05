@@ -52,36 +52,44 @@ public partial class Login : Form
     {
         var connection = ConnectionFactory.GetConnection();
         {
-            connection.Open();
-            string query = "SELECT Password FROM loginjustification WHERE Username = @username";
-            using (SqlCommand command = new SqlCommand(query, connection))
+            if (connection.State != ConnectionState.Open)
             {
-                command.Parameters.AddWithValue("@username", username);
-                using (SqlDataReader reader = command.ExecuteReader())
+                connection.Open();
+            }
+            try
+            {
+                string query = "SELECT Password FROM loginjustification WHERE Username = @username";
+                using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    if (reader.Read())
+                    command.Parameters.AddWithValue("@username", username);
+                    using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        string correctPassword = reader.GetString(0);
-                        if (password == correctPassword)
+                        if (reader.Read())
                         {
-                            return true;
+                            string correctPassword = reader.GetString(0);
+                            if (password == correctPassword)
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                throw new Exception("Mauvais mot de passe");
+                            }
                         }
                         else
                         {
-                            throw new Exception("Mauvais mot de passe");
+                            throw new Exception("Username inexistant");
                         }
                     }
-                    else
-                    {
-                        throw new Exception("Username inexistant");
-                    }
                 }
-            }
-           
-        }
-     
-    }
 
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+    }
     private void btnLeave_Click(object sender, EventArgs e)
     {
         Application.Exit();
