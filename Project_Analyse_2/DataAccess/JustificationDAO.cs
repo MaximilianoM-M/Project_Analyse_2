@@ -85,7 +85,6 @@ public class JustificationDAO
         }
 
         adapter.Fill(dataSet, TABLE_NAME);
-        this.connection.Close();
         DataTable table = dataSet.Tables[TABLE_NAME] ?? throw new Exception("table does not exist in dataset.");
     }
 
@@ -118,7 +117,7 @@ public class JustificationDAO
         }
 
         adapter.Update(dataSet, TABLE_NAME);
-        this.connection.Close();
+      
     }
 
 
